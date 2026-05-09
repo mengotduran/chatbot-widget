@@ -1,6 +1,9 @@
 export default async function handler(req, res) {
   const { messages, systemPrompt } = req.body;
 
+  // ✅ Safety check
+  const safeMessages = Array.isArray(messages) ? messages : [];
+
   const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -10,8 +13,8 @@ export default async function handler(req, res) {
     body: JSON.stringify({
       model: "llama3-8b-8192",
       messages: [
-        { role: "system", content: systemPrompt },
-        ...messages
+        { role: "system", content: systemPrompt || "You are a helpful assistant." },
+        ...safeMessages  // ✅ now uses safeMessages instead of messages
       ]
     })
   });
