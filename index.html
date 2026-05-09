@@ -1,19 +1,306 @@
-<!-- Custom Chatbot Widget -->
-<div id="chatbot-container" style="position:fixed;bottom:20px;right:20px;z-index:9999;font-family:sans-serif;">
-  <div id="chat-window" style="display:none;width:320px;height:420px;background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.15);display:flex;flex-direction:column;overflow:hidden;">
-    <div style="background:#4F46E5;color:white;padding:14px;font-weight:bold;font-size:15px;">💬 Chat with us</div>
-    <div id="chat-messages" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;"></div>
-    <div style="display:flex;padding:10px;border-top:1px solid #eee;">
-      <input id="chat-input" placeholder="Type a message..." style="flex:1;border:1px solid #ddd;border-radius:8px;padding:8px;font-size:14px;outline:none;" />
-      <button onclick="sendMessage()" style="margin-left:8px;background:#4F46E5;color:white;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;">Send</button>
+<!-- <!-- Custom Chatbot Widget --> -->
+<!-- <div id="chatbot-container" style="position:fixed;bottom:20px;right:20px;z-index:9999;font-family:sans-serif;"> -->
+<!--   <div id="chat-window" style="display:none;width:320px;height:420px;background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.15);display:flex;flex-direction:column;overflow:hidden;"> -->
+<!--     <div style="background:#4F46E5;color:white;padding:14px;font-weight:bold;font-size:15px;">💬 Chat with us</div> -->
+<!--     <div id="chat-messages" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;"></div> -->
+<!--     <div style="display:flex;padding:10px;border-top:1px solid #eee;"> -->
+<!--       <input id="chat-input" placeholder="Type a message..." style="flex:1;border:1px solid #ddd;border-radius:8px;padding:8px;font-size:14px;outline:none;" /> -->
+<!--       <button onclick="sendMessage()" style="margin-left:8px;background:#4F46E5;color:white;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;">Send</button> -->
+<!--     </div> -->
+<!--   </div> -->
+<!--   <button onclick="toggleChat()" style="background:#4F46E5;color:white;border:none;border-radius:50%;width:56px;height:56px;font-size:24px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2);margin-top:10px;">💬</button> -->
+<!-- </div> -->
+<!---->
+<!-- <script> -->
+<!-- const API_URL = "/api/chat"; -->
+<!-- const SYSTEM_PROMPT = `You are a helpful assistant for Mama's Pizza Restaurant. -->
+<!-- You help customers with: placing orders, checking our menu, and booking tables. -->
+<!-- Always be friendly, concise, and helpful. If you don't know something, say to contact us at mamaspizza@gmail.com or call +1234567890. -->
+<!-- Business info:  -->
+<!-- - We are open Mon-Sat 10am to 10pm -->
+<!-- - Our bestsellers are Pepperoni Pizza ($12), Margherita ($10), Pasta Carbonara ($9) -->
+<!-- - We offer free delivery on orders above $30 -->
+<!-- - We are located at 123 Main Street, Downtown`; -->
+<!---->
+<!-- let messages = []; -->
+<!-- let chatOpen = false; -->
+<!---->
+<!-- function toggleChat() { -->
+<!--   chatOpen = !chatOpen; -->
+<!--   document.getElementById("chat-window").style.display = chatOpen ? "flex" : "none"; -->
+<!-- } -->
+<!---->
+<!-- async function sendMessage() { -->
+<!--   const input = document.getElementById("chat-input"); -->
+<!--   const text = input.value.trim(); -->
+<!--   if (!text) return; -->
+<!---->
+<!--   addMessage(text, "user"); -->
+<!--   input.value = ""; -->
+<!--   messages.push({ role: "user", content: text }); -->
+<!---->
+<!--   const res = await fetch(API_URL, { -->
+<!--     method: "POST", -->
+<!--     headers: { "Content-Type": "application/json" }, -->
+<!--     body: JSON.stringify({ messages, systemPrompt: SYSTEM_PROMPT })  -->
+<!--   }); -->
+<!---->
+<!--   const data = await res.json(); -->
+<!--   addMessage(data.reply, "bot"); -->
+<!--   messages.push({ role: "assistant", content: data.reply }); -->
+<!-- } -->
+<!---->
+<!-- function addMessage(text, role) { -->
+<!--   const div = document.createElement("div"); -->
+<!--   div.style.cssText = `max-width:80%;padding:9px 12px;border-radius:10px;font-size:14px;line-height:1.4;align-self:${role==="user"?"flex-end":"flex-start"};background:${role==="user"?"#4F46E5":"#f1f1f1"};color:${role==="user"?"white":"#333"}`; -->
+<!--   div.textContent = text; -->
+<!--   document.getElementById("chat-messages").appendChild(div); -->
+<!--   document.getElementById("chat-messages").scrollTop = 9999; -->
+<!-- } -->
+<!---->
+<!-- document.getElementById("chat-input").addEventListener("keypress", e => e.key === "Enter" && sendMessage()); -->
+<!-- </script> -->
+
+
+// 
+<!-- ============================================================
+     CHATBOT WIDGET — paste everything below into your client's site
+     ============================================================ -->
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+
+<style>
+  #chatbot-container * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
+
+  #chatbot-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+  }
+
+  #chat-window {
+    width: 360px !important;
+    height: 520px !important;
+    background: #ffffff !important;
+    border-radius: 20px !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.08) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    transform-origin: bottom right;
+    transform: scale(0.85) translateY(16px);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease;
+  }
+  #chat-window.cw-open {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  #cw-header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+    padding: 18px 20px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  #cw-avatar {
+    width: 38px; height: 38px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  #cw-avatar svg { width: 20px; height: 20px; fill: white; }
+  #cw-header-text { flex: 1; }
+  #cw-header-text h3 { color: #fff; font-size: 15px; font-weight: 600; letter-spacing: -0.2px; }
+  #cw-header-text p  { color: rgba(255,255,255,0.6); font-size: 12px; margin-top: 2px; }
+  #cw-status-dot {
+    width: 8px; height: 8px;
+    background: #4ade80; border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(74,222,128,0.3);
+    animation: cw-pulse 2s infinite;
+  }
+  @keyframes cw-pulse {
+    0%,100% { box-shadow: 0 0 0 2px rgba(74,222,128,0.3); }
+    50%      { box-shadow: 0 0 0 5px rgba(74,222,128,0.1); }
+  }
+
+  #chat-messages {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 20px 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    background: #f8f9fb !important;
+    scroll-behavior: smooth;
+  }
+  #chat-messages::-webkit-scrollbar { width: 4px; }
+  #chat-messages::-webkit-scrollbar-track { background: transparent; }
+  #chat-messages::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+
+  .cw-msg {
+    max-width: 82% !important;
+    padding: 10px 14px !important;
+    border-radius: 16px !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    animation: cw-msgIn 0.25s cubic-bezier(0.34,1.4,0.64,1) both;
+    word-wrap: break-word;
+  }
+  @keyframes cw-msgIn {
+    from { opacity: 0; transform: translateY(8px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .cw-msg.user {
+    align-self: flex-end !important;
+    background: #1a1a2e !important;
+    color: #fff !important;
+    border-bottom-right-radius: 4px !important;
+  }
+  .cw-msg.bot {
+    align-self: flex-start !important;
+    background: #ffffff !important;
+    color: #1a1a2e !important;
+    border-bottom-left-radius: 4px !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07) !important;
+  }
+
+  #cw-typing {
+    align-self: flex-start;
+    background: #fff;
+    padding: 12px 16px;
+    border-radius: 16px;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    display: none;
+    gap: 5px;
+    align-items: center;
+  }
+  #cw-typing.show { display: flex; }
+  .cw-dot {
+    width: 7px; height: 7px;
+    background: #aaa; border-radius: 50%;
+    animation: cw-bounce 1.2s infinite ease-in-out;
+  }
+  .cw-dot:nth-child(2) { animation-delay: 0.15s; }
+  .cw-dot:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes cw-bounce {
+    0%,80%,100% { transform: translateY(0); background: #ccc; }
+    40%          { transform: translateY(-5px); background: #888; }
+  }
+
+  #cw-footer {
+    padding: 14px 16px;
+    background: #fff;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  #chat-input {
+    flex: 1 !important;
+    border: 1.5px solid #e8e8e8 !important;
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
+    font-size: 14px !important;
+    color: #1a1a2e !important;
+    outline: none !important;
+    background: #f8f9fb !important;
+    transition: border-color 0.2s, background 0.2s;
+    font-family: 'DM Sans', sans-serif !important;
+  }
+  #chat-input:focus { border-color: #1a1a2e !important; background: #fff !important; }
+  #chat-input::placeholder { color: #b0b0b0; }
+
+  #cw-send-btn {
+    width: 40px; height: 40px;
+    background: #1a1a2e;
+    border: none; border-radius: 12px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.15s, background 0.2s;
+  }
+  #cw-send-btn:hover { background: #0f3460; transform: scale(1.05); }
+  #cw-send-btn:active { transform: scale(0.95); }
+  #cw-send-btn svg { width: 17px; height: 17px; fill: white; }
+
+  #cw-toggle-btn {
+    width: 58px; height: 58px;
+    background: linear-gradient(135deg, #1a1a2e, #0f3460);
+    border: none; border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 24px rgba(15,52,96,0.4);
+    transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
+    position: relative; overflow: hidden;
+  }
+  #cw-toggle-btn:hover { transform: scale(1.08); box-shadow: 0 8px 30px rgba(15,52,96,0.5); }
+  #cw-toggle-btn svg { width: 26px; height: 26px; fill: white; transition: transform 0.3s, opacity 0.3s; position: absolute; }
+  #cw-icon-chat  { opacity: 1; transform: scale(1) rotate(0deg); }
+  #cw-icon-close { opacity: 0; transform: scale(0.5) rotate(-90deg); }
+  #cw-toggle-btn.open #cw-icon-chat  { opacity: 0; transform: scale(0.5) rotate(90deg); }
+  #cw-toggle-btn.open #cw-icon-close { opacity: 1; transform: scale(1) rotate(0deg); }
+
+  #cw-badge {
+    position: absolute; top: 4px; right: 4px;
+    width: 14px; height: 14px;
+    background: #ef4444; border-radius: 50%;
+    border: 2px solid white; display: none;
+  }
+  #cw-badge.show { display: block; }
+</style>
+
+<div id="chatbot-container">
+  <div id="chat-window">
+    <div id="cw-header">
+      <div id="cw-avatar">
+        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+      </div>
+      <div id="cw-header-text">
+        <h3>AI Assistant</h3>
+        <p>Always here to help</p>
+      </div>
+      <div id="cw-status-dot"></div>
+    </div>
+
+    <div id="chat-messages">
+      <div class="cw-msg bot">👋 Hi there! How can I help you today?</div>
+      <div id="cw-typing">
+        <div class="cw-dot"></div>
+        <div class="cw-dot"></div>
+        <div class="cw-dot"></div>
+      </div>
+    </div>
+
+    <div id="cw-footer">
+      <input id="chat-input" type="text" placeholder="Type a message..." autocomplete="off"/>
+      <button id="cw-send-btn" aria-label="Send">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
     </div>
   </div>
-  <button onclick="toggleChat()" style="background:#4F46E5;color:white;border:none;border-radius:50%;width:56px;height:56px;font-size:24px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2);margin-top:10px;">💬</button>
+
+  <button id="cw-toggle-btn" aria-label="Toggle chat">
+    <svg id="cw-icon-chat"  viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+    <svg id="cw-icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    <div id="cw-badge"></div>
+  </button>
 </div>
 
 <script>
-const API_URL = "/api/chat";
-const SYSTEM_PROMPT = `You are a helpful assistant for Mama's Pizza Restaurant.
+  const API_URL = "/api/chat";
+  const SYSTEM_PROMPT = `You are a helpful assistant for Mama's Pizza Restaurant.
 You help customers with: placing orders, checking our menu, and booking tables.
 Always be friendly, concise, and helpful. If you don't know something, say to contact us at mamaspizza@gmail.com or call +1234567890.
 Business info: 
@@ -22,41 +309,69 @@ Business info:
 - We offer free delivery on orders above $30
 - We are located at 123 Main Street, Downtown`;
 
-let messages = [];
-let chatOpen = false;
+  let messages = [];
+  let chatOpen = false;
 
-function toggleChat() {
-  chatOpen = !chatOpen;
-  document.getElementById("chat-window").style.display = chatOpen ? "flex" : "none";
-}
+  const chatWindow = document.getElementById("chat-window");
+  const toggleBtn  = document.getElementById("cw-toggle-btn");
+  const chatInput  = document.getElementById("chat-input");
+  const chatMsgs   = document.getElementById("chat-messages");
+  const typingEl   = document.getElementById("cw-typing");
+  const badge      = document.getElementById("cw-badge");
 
-async function sendMessage() {
-  const input = document.getElementById("chat-input");
-  const text = input.value.trim();
-  if (!text) return;
+  function toggleChat() {
+    chatOpen = !chatOpen;
+    chatWindow.classList.toggle("cw-open", chatOpen);
+    toggleBtn.classList.toggle("open", chatOpen);
+    badge.classList.remove("show");
+    if (chatOpen) setTimeout(() => chatInput.focus(), 300);
+  }
 
-  addMessage(text, "user");
-  input.value = "";
-  messages.push({ role: "user", content: text });
+  async function sendMessage() {
+    const text = chatInput.value.trim();
+    if (!text) return;
 
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ messages, systemPrompt: SYSTEM_PROMPT }) 
-  });
+    addMessage(text, "user");
+    chatInput.value = "";
+    messages.push({ role: "user", content: text });
 
-  const data = await res.json();
-  addMessage(data.reply, "bot");
-  messages.push({ role: "assistant", content: data.reply });
-}
+    typingEl.classList.add("show");
+    scrollBottom();
 
-function addMessage(text, role) {
-  const div = document.createElement("div");
-  div.style.cssText = `max-width:80%;padding:9px 12px;border-radius:10px;font-size:14px;line-height:1.4;align-self:${role==="user"?"flex-end":"flex-start"};background:${role==="user"?"#4F46E5":"#f1f1f1"};color:${role==="user"?"white":"#333"}`;
-  div.textContent = text;
-  document.getElementById("chat-messages").appendChild(div);
-  document.getElementById("chat-messages").scrollTop = 9999;
-}
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages, systemPrompt: SYSTEM_PROMPT })
+      });
+      const data = await res.json();
+      typingEl.classList.remove("show");
+      const reply = data.reply || "Sorry, I couldn't respond.";
+      addMessage(reply, "bot");
+      messages.push({ role: "assistant", content: reply });
+      if (!chatOpen) badge.classList.add("show");
+    } catch (e) {
+      typingEl.classList.remove("show");
+      addMessage("Something went wrong. Please try again.", "bot");
+    }
+  }
 
-document.getElementById("chat-input").addEventListener("keypress", e => e.key === "Enter" && sendMessage());
+  function addMessage(text, role) {
+    const div = document.createElement("div");
+    div.className = `cw-msg ${role}`;
+    div.textContent = text;
+    chatMsgs.insertBefore(div, typingEl);
+    scrollBottom();
+  }
+
+  function scrollBottom() {
+    setTimeout(() => { chatMsgs.scrollTop = chatMsgs.scrollHeight; }, 50);
+  }
+
+  toggleBtn.addEventListener("click", toggleChat);
+  document.getElementById("cw-send-btn").addEventListener("click", sendMessage);
+  chatInput.addEventListener("keypress", e => e.key === "Enter" && sendMessage());
 </script>
+<!-- ============================================================
+     END CHATBOT WIDGET
+     ============================================================ -->
